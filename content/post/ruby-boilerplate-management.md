@@ -1,5 +1,5 @@
 +++
-title = "Bootstraping Ruby application development with boilerplates"
+title = "Ruby application boilerplate"
 date = "2012-08-06T14:44:55+01:00"
 +++
 

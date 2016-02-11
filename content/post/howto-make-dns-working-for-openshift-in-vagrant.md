@@ -1,5 +1,5 @@
 +++
-title = "Making application DNS resolving working in Vagrant Openshift Origin"
+title = "Resolve application DNS in OpenShift v2"
 date = "2013-02-11T14:44:55+01:00"
 +++
 
