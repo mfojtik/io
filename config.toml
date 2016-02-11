@@ -1,8 +1,7 @@
 baseurl = "http://mifo.sk/"
 languageCode = "en-us"
 title = "mfojtik blog"
-log = false
-logFile = "/dev/stdout"
+log = true
 relativeURL = true
 
 [params]
