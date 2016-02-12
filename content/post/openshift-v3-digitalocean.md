@@ -1,6 +1,7 @@
 +++
 title = "Running OpenShift v3 on DigitalOcean"
 date = "2016-02-12T14:44:55+01:00"
+comments = true
 +++
 
 I'm running this blog (and couple other blogs and side-projects) on
