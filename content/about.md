@@ -5,3 +5,5 @@ title = "about"
 
 +++
 
+Hi from stage!
+
