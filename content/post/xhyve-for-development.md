@@ -106,15 +106,11 @@ CMDLINE="earlyprintk=serial quiet console=ttyS0 acpi=off root=/dev/mapper/centos
 MEM="-m 4G"
 SMP="-c 2"
 NET="-s 2:0,virtio-net"
-#IMG_CD="-s 3,ahci-cd,/Users/will/Downloads/CentOS-7-x86_64-Minimal-1511.iso"
 IMG_HDD="-s 4,virtio-blk,./hdd.img"
 PCI_DEV="-s 0:0,hostbridge -s 31,lpc"
 LPC_DEV="-l com1,stdio"
-#ACPI="-A"
 UUID="-U deadbeef-dead-dead-dead-deaddeafbeef"
-
-# Linux
-xhyve $ACPI $MEM $SMP $PCI_DEV $LPC_DEV $NET $IMG_CD $IMG_HDD $UUID \
+sudo xhyve $ACPI $MEM $SMP $PCI_DEV $LPC_DEV $NET $IMG_CD $IMG_HDD $UUID \
   -f kexec,$KERNEL,$INITRD,"$CMDLINE"
 ```
 
