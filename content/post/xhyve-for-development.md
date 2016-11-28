@@ -33,7 +33,7 @@ $ hdiutil attach /tmp/tmp.iso
 Now we need to copy the `vmlinuz` and `initrd.gz`:
 
 ```
-$ cp /Volumes/CentOS\ 7\ x86_64/{vmlinuz,initrd.gz} .
+$ cp /Volumes/CentOS\ 7\ x86_64/isolinux/{vmlinuz,initrd} .
 ```
 
 Next we need to pre-allocate the file that will serve as hard drive for our VM.
