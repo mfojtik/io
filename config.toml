@@ -1,4 +1,4 @@
-baseurl = "http://mifo.sk"
+baseurl = "http://mfojtik.io"
 languageCode = "en-us"
 title = "mfojtik blog"
 log = true
