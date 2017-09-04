@@ -4,7 +4,7 @@ date = "2016-02-18T14:44:55+01:00"
 comments = true
 +++
 
-In my [previous](http://mifo.sk/post/openshift-v3-digitalocean/) post I
+In my [previous](http://mfojtik.im/post/openshift-v3-digitalocean/) post I
 described how I transitioned myself into the *container era* by installing the
 OpenShift v3 in [DigitalOcean](http://digitalocean.com) and containerizing my
 applications. This post will describe how I moved from my previous blog engine
