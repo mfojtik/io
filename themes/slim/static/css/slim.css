@@ -85,10 +85,6 @@ a {
   a:hover, a:focus {
     text-decoration: underline; }
 
-em {
-  text-emphasis-style: circle;
-  text-emphasis-position: under; }
-
 code {
   font-family: 'Source Code Pro', Monaco, Courier, monospace;
   font-size: 0.85rem;
