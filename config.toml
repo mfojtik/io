@@ -4,6 +4,7 @@ title = "mfojtik blog"
 log = true
 relativeURL = true
 
+# Parameters here
 [params]
   Subtitle = "Look at you, hacker. A pathetic creature of meat and bone, panting and sweating as you run through my corridors. How can you challenge perfect immortal machine"
   GithubID = "mfojtik"
