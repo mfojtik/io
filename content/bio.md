@@ -11,4 +11,3 @@ Michal is a Principal Software Engineer at [Red Hat](http://redhat.com). For the
 * [LinkedIn Profile](https://www.linkedin.com/in/michalfojtik)
 * [Fedora Project](https://fedoraproject.org/wiki/User:Mfojtik)
 
-    foo
