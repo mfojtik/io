@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+pipe=/tmp/log
+hugo_pid=""
+
+# Cleanup..
+trap "rm -f $pipe" EXIT
+
+# Setup logging to stdout
+[[ ! -p $pipe ]] && mkfifo $pipe
+while true; do read line <$pipe && echo $line; done &
+
+# Start hugo server
+hugo server --baseURL=${HUGO_BASE_URL} \
+  --theme ${HUGO_THEME} \
+  --bind=0.0.0.0 \
+  --port=8080 \
+  --disableLiveReload=true \
+  --watch=false \
+  --appendPort=false \
+  --verboseLog \
+  --logFile=$pipe &
+
+trap "kill $!" EXIT
+wait $hugo_pid

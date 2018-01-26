@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title> OpenShift v2 in DigitalOcean &middot; mfojtik blog </title>
+
+
+<link rel="stylesheet" href="http://mfojtik.io/css/slim.css">
+<link rel="stylesheet" href="http://mfojtik.io/css/highlight.min.css">
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Source+Code+Pro' rel='stylesheet' type='text/css'>
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+<link rel="shortcut icon" href="/favicon.ico">
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+  <h1 class="site-title"><a href="http://mfojtik.io">mfojtik blog</a></h1>
+  <p class="site-tagline"><em>Look at you, hacker. A pathetic creature of meat and bone, panting and sweating as you run through my corridors. How can you challenge perfect immortal machine</em></p>
+  <div class="nav">
+    <a class="nav-btn" href="#">
+      <span class="ci ci-burger"></span>
+    </a>
+    <ul class="nav-list">
+       
+	  <li class="spacer">&ac;</li>
+
+      <li><a href="https://github.com/mfojtik">Github</a></li> 
+      <li><a href="https://twitter.com/mfojtik">Twitter</a></li> 
+    </ul>
+  </div>
+</div>
+
+    <div class="content">
+      <div class="posts">
+        <div class="post">
+          <h2 class="post-title"><a href="http://mfojtik.io/post/openshift-on-digitalocean/">OpenShift v2 in DigitalOcean</a></h2>
+          <span class="post-date">Oct 29, 2013 </span>
+          <div class="post-content">
+            <p><a href="http://digitalocean.com">DigitalOcean</a> is a new IaaS provider, similar to the
+Amazon EC2. Comparing to the AWS, DigitalOcean is still a small fish in the IaaS
+cloud market, but due to their offerring of SSD storage, they are attracting
+more and more users.</p>
+
+<p><a href="http://openshift.com">OpenShift</a> is a PaaS service, developed by <a href="http://redhat.com">Red
+Hat</a>. OpenShift Origin, compared to
+the <a href="http://heroku.com">Heroku</a> is an OpenSource project, so you can install it on
+your own machine and then run your own PaaS.</p>
+
+<p>OpenShift Online infrastracture is built on top of Amazon EC2, so I want to try
+how it would be to run my own PaaS, but on DigitalOcean. DigitalOcean, as I
+mentioned before, offers SSD storage and also a datacenter in EU. So I created an
+account and immediately got a $10 credit for my experiments using their coupon.</p>
+
+<p>Once I logged into their administration console, I uploaded my public SSH
+key to be able to login into the created &lsquo;droplets&rsquo; (a &lsquo;droplet&rsquo; is an equivalent to the
+Amazon EC2 &lsquo;instance&rsquo;).</p>
+
+<p>For my experiments, I chosed the <em>Fedora 19 x86-64</em> image with 1GB of RAM, 1 CPU
+and 30 GB of SSD storage. I also assigned my imported SSH key to it. It is also
+important to set the hostname. I used <em>example</em>, but I think you should choose a
+valid DNS name of the domain you own.</p>
+
+<p>Once the droplet was created, I used SSH to connect and explore what needs to be
+done to install OpenShift. First thing I discovered was that DigitalOcean
+disables SELinux by default. Not a surprise, Amazon AWS does that as
+well.
+To enable it, I edited the <code>/etc/sysconfig/selinux</code> file:</p>
+
+<pre><code>SELINUX=enforcing
+SELINUXTYPE=targeted
+</code></pre>
+
+<p>Now, to finish this change, you have to reboot the droplet. You can do that from
+inside the droplet by typing <code>reboot</code> or from the administration
+interface.</p>
+
+<p>Once the droplet is back on again, verify that SELinux is properly enabled:</p>
+
+<pre><code>$ getenforce
+Enforcing
+</code></pre>
+
+<p>To install OpenShift Origin, I used the <a href="https://github.com/tdawson/oo-install-scripts">oo-install</a>
+utility. This tool requires some packages to be installed on the base operating system:</p>
+
+<pre><code>$ yum -y install ruby unzip httpd-tools puppet bind
+</code></pre>
+
+<p>Now is the time to run <code>oo-install</code>:</p>
+
+<pre><code>$ sh &lt;(curl -s http://oo-install.rhcloud.com)
+</code></pre>
+
+<p>The install script will ask you couple of questions, but I just keep the defaults.
+There is a nice introduction <a href="http://www.youtube.com/watch?v=T91Xc8rItek">video</a>
+that explains various options you can use.</p>
+
+<p>The install script will take some time to finish provisioning using Puppet and
+during that process you will see couple errors. Some of them are OK to ignore,
+and the others are already reported as bugs. So don&rsquo;t worry about them for now.</p>
+
+<p>When the install script finishes, I recommend to reboot the droplet again to get
+all services started correctly.</p>
+
+<p><strong>UPDATE</strong>: You can now skip to &lsquo;htpassword&rsquo; command, as the workarounds below
+are now fixed in oo-install script and not needed!</p>
+
+<p>After reboot, I experiences some problems with the MongoDB. I think those are
+caused by the Puppet script errors, but if this occurs to you, it is easy to
+fix. Just edit the <code>/etc/mongodb.conf</code> and add these lines:</p>
+
+<pre><code>smallfiles=true
+auth=true
+</code></pre>
+
+<p>Next problem I was experiencing was missing MongoDB account for the OpenShift
+user. I think this is related to the previous problem, so hopefully get fixed
+soon. You can add the user to MongoDB manually by:</p>
+
+<pre><code>$ mongo openshift_broker_dev --eval 'db.addUser(&quot;openshift&quot;, &quot;PASSWORD&quot;)
+</code></pre>
+
+<p>The &lsquo;PASSWORD&rsquo; is located in the <code>/etc/openshift/broker-dev.conf</code> file, so just
+copy and paste it to the command line. Once you make these changes, restart the
+mongodb service:</p>
+
+<pre><code>$ service mongod restart
+</code></pre>
+
+<p>Now is the time to verify that the OpenShift Broker is running correctly:</p>
+
+<pre><code>$ curl -k https://localhost/broker/rest/api
+</code></pre>
+
+<p>If you get JSON back, they you are done. If not, you need to go to
+<code>/var/log/openshift/broker/httpd_logs</code> directory and check if everything is OK
+there.</p>
+
+<p>Next step is to create some OpenShift &lsquo;demo&rsquo; user. To do so, you need to type
+this command:</p>
+
+<pre><code>$ htpasswd -c /etc/openshift/htpasswd demo
+</code></pre>
+
+<p>Almost done. Now you should be able to run the <code>rhc setup</code> command. Use the
+&lsquo;demo&rsquo; user credentials for authentication. You should also be able to create a
+new applications.</p>
+
+<p>I said almost done, because the applications you create will use the &lsquo;example&rsquo;
+domain. I haven&rsquo;t tried yet using my own domain, but I guess it should be easy.
+All you need to do is to point the nameserver of your domain to the DigitalOcean
+droplet and let the DNS server on the droplet manage things.</p>
+
+          </div>
+        </div>
+        <div class="pagination">
+          <a class="btn previous " href="http://mfojtik.io/post/publishing-presentations-on-openshift/"> Prev</a>  
+          <a class="btn next " href="http://mfojtik.io/post/ruby-websockets-on-openshift/"> Next</a> 
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+  <p>Powered by <a href="http://gohugo.io">hugo</a> and the <a
+    href="https://github.com/zhe/hugo-theme-slim">slim</a> theme.</p>
+</div>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-109743259-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-109743259-2');
+</script>
+
+  </div>
+  <script src="http://mfojtik.io/js/slim.js"></script>
+  <script src="http://mfojtik.io/js/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+  
+</body>
+
+</html>

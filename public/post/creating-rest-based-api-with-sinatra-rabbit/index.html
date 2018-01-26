@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title> Creating REST API&#39;s using Sinatra and Rabbit &middot; mfojtik blog </title>
+
+
+<link rel="stylesheet" href="http://mfojtik.io/css/slim.css">
+<link rel="stylesheet" href="http://mfojtik.io/css/highlight.min.css">
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Source+Code+Pro' rel='stylesheet' type='text/css'>
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+<link rel="shortcut icon" href="/favicon.ico">
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+  <h1 class="site-title"><a href="http://mfojtik.io">mfojtik blog</a></h1>
+  <p class="site-tagline"><em>Look at you, hacker. A pathetic creature of meat and bone, panting and sweating as you run through my corridors. How can you challenge perfect immortal machine</em></p>
+  <div class="nav">
+    <a class="nav-btn" href="#">
+      <span class="ci ci-burger"></span>
+    </a>
+    <ul class="nav-list">
+       
+	  <li class="spacer">&ac;</li>
+
+      <li><a href="https://github.com/mfojtik">Github</a></li> 
+      <li><a href="https://twitter.com/mfojtik">Twitter</a></li> 
+    </ul>
+  </div>
+</div>
+
+    <div class="content">
+      <div class="posts">
+        <div class="post">
+          <h2 class="post-title"><a href="http://mfojtik.io/post/creating-rest-based-api-with-sinatra-rabbit/">Creating REST API&#39;s using Sinatra and Rabbit</a></h2>
+          <span class="post-date">Mar 1, 2012 </span>
+          <div class="post-content">
+            
+
+<p>When we started working on <a href="http://deltacloud.org">Deltacloud API</a> rewrite to
+<a href="http://www.sinatrarb.com">Sinatra</a>, we realized that creating routes for
+every single Deltacloud collection can be pretty frustrating. Usually, when you
+writing <strong>REST</strong> based application in Sinatra you end-up with typing the same
+<strong>CRUD</strong>
+operations for every collection of resources your application have.</p>
+
+<p>This was a bit frustrating, since many operations are similar and basically
+doing the same thing. For example the &lsquo;show&rsquo; operation is usually defined like this:</p>
+
+<script src="https://gist.github.com/2039912.js?file=show.rb"></script>
+
+<p>Basically you type this code over and over for all <code>:show</code> operations.
+The only thing you change is the &lsquo;item&rsquo;.
+Also if you want to have your API easy discoverable for clients, you also need
+to define <em>OPTIONS</em> and <em>HEAD</em> routes to advertise supported operations or
+parameters.</p>
+
+<p>The powerful weapon that Ruby allows to programmers do, is easy
+<a href="http://www.artima.com/rubycs/articles/ruby_as_dsl.html">DSL</a> creation.  So we
+decided to move over and replace the non-DRY, hard to read code with some
+elegant DSL. We call it Rabbit and we basically use it to serve all collections
+and operations. The only mistake we made in time when we started to write Rabbit
+was that we use classic non-modular Sinatra style.</p>
+
+<p>Since Rails and other frameworks support
+<a href="https://github.com/josh/rack-mount">mounting</a> of &lsquo;rack&rsquo; applications, the
+importance of having the &lsquo;modular&rsquo; Sinatra applications is growing up.
+And we need to somehow follow this movement too.</p>
+
+<p>As a first step I started working on moving Rabbit (our DSL) away from the
+Deltacloud project to make it as upstream rubygem, that could be included into
+any Sinatra application (both modular and non-modular). I created a
+<a href="https://github.com/mfojtik/sinatra-rabbit">repository</a> on
+<a href="http://github.com">Github</a> and today, version
+<a href="http://rubygems.org/gems/sinatra-rabbit/versions/1.0">1.0</a> was released.</p>
+
+<h2 id="introduction-to-rabbit">Introduction to Rabbit</h2>
+
+<p>Let start with very simple, REST based, modular Sinatra app:</p>
+
+<script src="https://gist.github.com/2040049.js?file=rabbit_example1.rb"></script>
+
+<p>In begging, we need to require the <code>sinatra/rabbit</code> Sinatra
+extension.  This extension is shipped as rubygem and can be installed using
+<code>gem install sinatra-rabit</code>.  Requiring Rabbit isn&rsquo;t invasive and
+will not extend the Sinatra::Base class with Rabbit methods automatically. To do
+so, you would need to do <code>include Sinatra::Rabbit</code> inside your
+Sinatra::Base class (MyApp in this case). This allows you to use the DSL
+syntax sugar in MyApp class, but also keep the good old Sinatra routes and helpers
+available.</p>
+
+<p>The <code>collection</code> method is used to declare a new resources collection.
+The one in example above represents &lsquo;images&rsquo;. All collections and operations can have
+description set using the <code>description</code> method. This description will be
+used later for automatic documentation generation. This is not implemented yet.</p>
+
+<p>The DSL define standard set of CRUD operations and will automatically add
+corresponding HTTP method to each operation. For example the <code>:create</code>
+operation will automatically be defined as <code>POST /images</code> and the
+<code>:destroy</code> operation will get the HTTP DELETE method.</p>
+
+<p>Operations can also use various POST/GET parameters. For example in the
+<code>:create</code> operation the <code>:name</code> parameter is required.
+But as you see, there is no validation in the <code>control</code> block. Trick
+is that the parameter validation is done automatically. So whenever the &lsquo;create&rsquo;
+operation is called without the &lsquo;name&rsquo; parameter, Rabbit automatically reply with
+the 400 HTTP status code, including missing parameter in the HTTP body response
+for the client.</p>
+
+<p>The <code>control</code> block is used to determine what code will be executed
+when client access the operation. You can use all Sinatra helpers, like template
+helpers (haml, sass, &hellip;) or flow helpers (halt, status, &hellip;) freely inside this
+block.</p>
+
+<h2 id="advanced-features">Advanced features</h2>
+
+<p>With the power of DSL, you can play with the code more and make it more abstract
+and mote easy for user to understand. Besides route generation and parameter
+validation, Rabbit also support more advanced features which can be handy:</p>
+
+<h2 id="conditional-routes">Conditional routes</h2>
+
+<script src="https://gist.github.com/2040178.js?file=cond_routes.rb"></script>
+
+<p>Using the <code>:if</code> option in the operation definition will make &lsquo;skip&rsquo;
+that operation if the condition given as value is evaluated as false.</p>
+
+<h2 id="sub-collections">Sub-collections</h2>
+
+<script src="https://gist.github.com/2040191.js?file=subcollections.rb"></script>
+
+<p>In some specific use-cases, you want to have sub-collection of resources. In
+example above, we have collection <code>:buckets</code>. This collection
+represents something like a directory, which can store files (blobs). You can
+have multiple buckets and each bucket can have multiple blobs.</p>
+
+<h2 id="client-discovery">Client discovery</h2>
+
+<p>Rabbit will automatically define couple routes around collections or operations.
+These routes can help to your clients to discover API structure, like to get
+list of operations defined for collection or list of parameters defined for
+the operation.</p>
+
+<p>For example requesting <code>OPTIONS /images</code> (OPTIONS is HTTP method)
+will give you list of available operations in &lsquo;images&rsquo; collection.  Also
+requesting <code>OPTIONS /images/create</code> will give you list of
+parameters that this operation supports.</p>
+
+          </div>
+        </div>
+        <div class="pagination">
+          <a class="btn previous " href="http://mfojtik.io/post/avoiding-anti-patterns-in-ruby/"> Prev</a>  
+          <a class="btn next " href="http://mfojtik.io/post/deltacloud-at-fosdem-2012/"> Next</a> 
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+  <p>Powered by <a href="http://gohugo.io">hugo</a> and the <a
+    href="https://github.com/zhe/hugo-theme-slim">slim</a> theme.</p>
+</div>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-109743259-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-109743259-2');
+</script>
+
+  </div>
+  <script src="http://mfojtik.io/js/slim.js"></script>
+  <script src="http://mfojtik.io/js/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+  
+</body>
+
+</html>

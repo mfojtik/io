@@ -1,14 +1,55 @@
 baseurl = "http://mfojtik.io"
 languageCode = "en-us"
-title = "mfojtik blog"
-log = true
-relativeURL = true
+Title = "@mfojtik blog"
+copyright = "&copy; mfojtik"
 
-# Parameters here
 [params]
-  Subtitle = "Look at you, hacker. A pathetic creature of meat and bone, panting and sweating as you run through my corridors. How can you challenge perfect immortal machine"
-  GithubID = "mfojtik"
-  TwitterID = "mfojtik"
-  DisqusShortname = "mfojtik"
-  Summary = true
-  Content = true
+  paginate = 10
+  twitter = "mfojtik"
+  instagram = "mifosk"
+  github = "mfojtik"
+  # Disqus shortname
+  disqus = "mfojtik"
+  # Google Analytics API key.
+  ga_api_key = "UA-109743259-2'"
+  author = "Michal Fojtik"
+  authorwebsite = "mfojtik.io"
+  avatar = "https://avatars0.githubusercontent.com/u/44136"
+  contact = "mailto:blog@mfojtik.io"
+  bio = "Software Engineer working on Kubernetes and OpenShift, Gopher, hiker, climber."
+  subtitle = "Look at you, hacker. A pathetic creature of meat and bone, panting and sweating as you run through my corridors. How can you challenge perfect immortal machine."
+
+[[menu.main]]
+    name = "/blog"
+    url = "/"
+    weight = 1
+
+[[menu.main]]
+    name = "/bio"
+    url = "/bio"
+    weight = 2
+
+[related]
+  # Only include matches with rank >= threshold. This is a normalized rank between 0 and 100.
+  threshold = 80
+
+  # To get stable "See also" sections we, by default, exclude newer related pages.
+  includeNewer = false
+
+  # Will lower case keywords in both queries and in the indexes.
+  toLower = false
+
+  [[related.indices]]
+  name = "keywords"
+  weight = 150
+  [[related.indices]]
+  name  = "author"
+  toLower = true
+  weight = 30
+  [[related.indices]]
+  name  = "tags"
+  weight = 100
+  [[related.indices]]
+  name  = "date"
+  weight = 10
+  pattern = "2017"

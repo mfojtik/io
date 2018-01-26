@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+if [ -z "${HUGO_BASE_URL}" ]; then
+    echo "Variable HUGO_BASE_URL must be set"
+    exit 1
+fi
+if [ -z "${HUGO_THEME}" ]; then
+    echo "Variable HUGO_THEME must be set"
+    exit 1
+fi
+
+set +e
+set +x
+
+cp -Rf /tmp/src/. ./
+
+hugo --baseURL=${HUGO_BASE_URL} \
+     --theme ${HUGO_THEME} \
+     --renderToMemory
+
+rm -rf public

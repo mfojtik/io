@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title> Building secure Docker images &middot; mfojtik blog </title>
+
+
+<link rel="stylesheet" href="http://mfojtik.io/css/slim.css">
+<link rel="stylesheet" href="http://mfojtik.io/css/highlight.min.css">
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Source+Code+Pro' rel='stylesheet' type='text/css'>
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+<link rel="shortcut icon" href="/favicon.ico">
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+  <h1 class="site-title"><a href="http://mfojtik.io">mfojtik blog</a></h1>
+  <p class="site-tagline"><em>Look at you, hacker. A pathetic creature of meat and bone, panting and sweating as you run through my corridors. How can you challenge perfect immortal machine</em></p>
+  <div class="nav">
+    <a class="nav-btn" href="#">
+      <span class="ci ci-burger"></span>
+    </a>
+    <ul class="nav-list">
+       
+	  <li class="spacer">&ac;</li>
+
+      <li><a href="https://github.com/mfojtik">Github</a></li> 
+      <li><a href="https://twitter.com/mfojtik">Twitter</a></li> 
+    </ul>
+  </div>
+</div>
+
+    <div class="content">
+      <div class="posts">
+        <div class="post">
+          <h2 class="post-title"><a href="http://mfojtik.io/post/secure-docker-images/">Building secure Docker images</a></h2>
+          <span class="post-date">Apr 7, 2016 </span>
+          <div class="post-content">
+            <p>A lot was written about <a href="http://docker.org">Docker</a> security and how to run
+Docker in a secure way. But there are not many articles describing how to write
+Docker images, which are secure and easy to maitain. According to <a href="http://www.infoq.com/news/2015/05/Docker-Image-Vulnerabilities">this
+article</a> over
+30% of the official Docker images published to Docker Hub contain some security
+vuleabilities.</p>
+
+<p>Here is my list of rules to follow when I&rsquo;m building Docker images:</p>
+
+<ul>
+<li><p><strong>Do not run as &ldquo;root&rdquo;</strong> - almost every image published on Docker hub does not
+set the <code>USER</code> instruction, which means they expect to be run as the <code>root</code>
+user. Where Docker provides some level of isolation, it is never bad idea to
+add yet another barrier for the malicious process to escape from the Docker
+container. For example in <a href="http://github.com/openshift/origin">OpenShift</a>
+the default rule is set to disallow running containers as &ldquo;root&rdquo; and instead
+the container is started using random user ID.
+You can create non-privileged user in Dockerfile and use <code>USER foo</code>
+instruction at the end. Then make writeable only those directories you know
+the process running in the container is going to write to.</p></li>
+
+<li><p><strong>Use nss_wrapper if necessary</strong> - if the process that run inside container
+really need to have UID to user name mapping, you can use <a href="https://cwrap.org/nss_wrapper.html">nss_wrapper</a>
+to provide it.</p></li>
+
+<li><p><strong>Do not update the base image</strong> - this is not that much security related, but
+you should learn to trust the base image provider. It is really his job to
+keep the base image content up-to-date for you. That also include all
+security fixes, testing, verifications, etc.. If you do update the software
+in your image yourself, you might, by accident pull some insecure/untested bits (it
+happens&hellip;). If the base Docker image provider does not update the base image
+frequently, maybe it is time to move to another base image.</p></li>
+
+<li><p><strong>Avoid curl|bash</strong> - this is <strong>always</strong> a bad idea. You really don&rsquo;t have a control
+over the shell script that you pull from the internet.</p></li>
+
+<li><p><strong>The <code>:latest</code> is not a version</strong> - you should version your image properly.
+Use Docker <a href="https://docs.docker.com/engine/reference/commandline/tag/">tags</a> to do so.</p></li>
+
+<li><p><strong>It is better to freeze dependencies</strong> - instead of always pulling the
+&ldquo;latest&rdquo; versions of Ruby gems, Python modules, NPM modules, etc. it is
+better to explicitly lock the versions your application is using when
+building the image. Also it is sometimes better to vendor them in same
+repository where you have your Dockerfile (how often is rubygems.org down?).
+Following this rule means you will be able to consistently rebuild the image
+without ending up with different versions.</p></li>
+
+<li><p><strong>Verify content you download</strong> - <a href="https://www.gnupg.org/">gnupg</a> is your friend in case you using <code>ADD</code>
+from a HTTP(S) location. Make sure what you downloaded is really what you
+expected.</p></li>
+
+<li><p><strong>Do not rely on squashing</strong> - scary right? You add a
+secret password file in one layer, use it in another layer and remove it in third
+layer. Now you squash the final image to minimize the size of layers and the
+secret password file is back. Always verify that before you pushing content
+to Docker hub.</p></li>
+</ul>
+
+          </div>
+        </div>
+        <div class="pagination">
+          <a class="btn previous " href="http://mfojtik.io/post/xhyve-for-development/"> Prev</a>  
+          <a class="btn next " href="http://mfojtik.io/post/file-sharing-on-openshift/"> Next</a> 
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+  <p>Powered by <a href="http://gohugo.io">hugo</a> and the <a
+    href="https://github.com/zhe/hugo-theme-slim">slim</a> theme.</p>
+</div>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-109743259-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-109743259-2');
+</script>
+
+  </div>
+  <script src="http://mfojtik.io/js/slim.js"></script>
+  <script src="http://mfojtik.io/js/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+  
+</body>
+
+</html>

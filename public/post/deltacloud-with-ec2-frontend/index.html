@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title> Deltacloud with EC2 frontend? Why not. &middot; mfojtik blog </title>
+
+
+<link rel="stylesheet" href="http://mfojtik.io/css/slim.css">
+<link rel="stylesheet" href="http://mfojtik.io/css/highlight.min.css">
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Source+Code+Pro' rel='stylesheet' type='text/css'>
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+<link rel="shortcut icon" href="/favicon.ico">
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+  <h1 class="site-title"><a href="http://mfojtik.io">mfojtik blog</a></h1>
+  <p class="site-tagline"><em>Look at you, hacker. A pathetic creature of meat and bone, panting and sweating as you run through my corridors. How can you challenge perfect immortal machine</em></p>
+  <div class="nav">
+    <a class="nav-btn" href="#">
+      <span class="ci ci-burger"></span>
+    </a>
+    <ul class="nav-list">
+       
+	  <li class="spacer">&ac;</li>
+
+      <li><a href="https://github.com/mfojtik">Github</a></li> 
+      <li><a href="https://twitter.com/mfojtik">Twitter</a></li> 
+    </ul>
+  </div>
+</div>
+
+    <div class="content">
+      <div class="posts">
+        <div class="post">
+          <h2 class="post-title"><a href="http://mfojtik.io/post/deltacloud-with-ec2-frontend/">Deltacloud with EC2 frontend? Why not.</a></h2>
+          <span class="post-date">Jul 7, 2012 </span>
+          <div class="post-content">
+            <p>We are doing the <a href="http://deltacloud.org">Deltacloud API</a> project because we think that preventing from
+vendor API lock-in is very important to everyone who uses services provided by a
+public or private cloud vendor.
+But what if you are already locked in to one particular cloud API? And yes, I am
+speaking about the <a href="http://docs.amazonwebservices.com/AWSEC2/latest/APIReference/Welcome.html?r=7611">Amazon EC2 API</a>
+which seems to by widely adopted. Since this API is
+soo popular, the other projects like <a href="https://github.com/yahoo/Openstack-EC2">OpenStack</a> or <a href="http://www.eucalyptus.com/">Eucalyptus</a> provide an EC2 API
+adaptor for those who are already locked by Amazon EC2.</p>
+
+<p>In Deltacloud, we have our own API specification and in some case that could be a
+deal breaker for some clients. Clients would need to change the code they already have
+and start implementing our API standard. But this no longer true.</p>
+
+<p>Deltacloud API now provides an <strong>experimental support</strong> for Amazon Elastic Compute
+Cloud (2012-05-01) API as a frontend. Currently, only few &ldquo;actions&rdquo; are supported
+but it is enough to run an instance in whatever backend cloud Deltacloud project
+<a href="http://deltacloud.apache.org/drivers.html#providers">supports</a>.</p>
+
+<p>To use EC2 frontend, you need to checkout the latest Deltacloud code from the GIT
+repository. Then inside the <code>server/</code> directory run:</p>
+
+<p><code>$ bundle install </code></p>
+
+<p><code>$ ./bin/deltacloud -i mock -f ec2</code></p>
+
+<p>Now, Deltacloud API should be running on port 3001 and you can start
+experimenting:</p>
+
+<script src="https://gist.github.com/2888387.js?file=test.sh"></script>
+
+<p>So far these EC2 Actions are supported:</p>
+
+<ul>
+<li>DescribeAvailabilityZones</li>
+<li>DescribeImages</li>
+<li>DescribeInstances</li>
+<li>DescribeKeyPairs</li>
+<li>CreateKeyPair</li>
+<li>DeleteKeyPair</li>
+<li>RunInstances</li>
+<li>StopInstances</li>
+<li>StartInstances</li>
+<li>RebootInstances</li>
+<li>TerminateInstances</li>
+</ul>
+
+<p>There are certain limitations currently which we will need to deal with in near
+future. For now for example, you are not allowed to launch multiple instances
+(<strong>RunInstances</strong>)
+or do operations using multiple instance syntax (<strong>InstanceId.n</strong>). This frontend only works with one instance per request.
+Another problem is that you cannot query for the <strong>InstanceTypes</strong>.
+The reason for this is that EC2 Query API does not provide any &ldquo;action&rdquo; that can
+list the supported instance types. For this, you will always need to &ldquo;fallback&rdquo;
+to the Deltacloud API to obtain the list you can use for the <em>RunInstances</em>
+operation.</p>
+
+          </div>
+        </div>
+        <div class="pagination">
+          <a class="btn previous " href="http://mfojtik.io/post/ruby-boilerplate-management/"> Prev</a>  
+          <a class="btn next " href="http://mfojtik.io/post/nicer-ruby-exceptions/"> Next</a> 
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+  <p>Powered by <a href="http://gohugo.io">hugo</a> and the <a
+    href="https://github.com/zhe/hugo-theme-slim">slim</a> theme.</p>
+</div>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-109743259-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-109743259-2');
+</script>
+
+  </div>
+  <script src="http://mfojtik.io/js/slim.js"></script>
+  <script src="http://mfojtik.io/js/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+  
+</body>
+
+</html>

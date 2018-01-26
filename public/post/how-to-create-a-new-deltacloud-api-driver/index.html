@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title> How to create a new Deltacloud API driver &middot; mfojtik blog </title>
+
+
+<link rel="stylesheet" href="http://mfojtik.io/css/slim.css">
+<link rel="stylesheet" href="http://mfojtik.io/css/highlight.min.css">
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Source+Code+Pro' rel='stylesheet' type='text/css'>
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+<link rel="shortcut icon" href="/favicon.ico">
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+  <h1 class="site-title"><a href="http://mfojtik.io">mfojtik blog</a></h1>
+  <p class="site-tagline"><em>Look at you, hacker. A pathetic creature of meat and bone, panting and sweating as you run through my corridors. How can you challenge perfect immortal machine</em></p>
+  <div class="nav">
+    <a class="nav-btn" href="#">
+      <span class="ci ci-burger"></span>
+    </a>
+    <ul class="nav-list">
+       
+	  <li class="spacer">&ac;</li>
+
+      <li><a href="https://github.com/mfojtik">Github</a></li> 
+      <li><a href="https://twitter.com/mfojtik">Twitter</a></li> 
+    </ul>
+  </div>
+</div>
+
+    <div class="content">
+      <div class="posts">
+        <div class="post">
+          <h2 class="post-title"><a href="http://mfojtik.io/post/how-to-create-a-new-deltacloud-api-driver/">How to create a new Deltacloud API driver</a></h2>
+          <span class="post-date">Aug 10, 2011 </span>
+          <div class="post-content">
+            
+
+<p>Even if we try hard in <a href="http://deltacloud.org">Deltacloud project</a> to support as
+many different cloud providers as we can, we just can&rsquo;t cover every cloud. Also,
+it might come that you&rsquo;re building your own cloud based on some
+virtualization like <a href="http://libvirt.org">libvirt</a> or Xen and you have your
+custom tools to manage it but you want to offer a <strong>REST API</strong> for your service
+to make your customers happy. Then this small guide might be handy for you.</p>
+
+<h2 id="collecting-collections">Collecting collections</h2>
+
+<p>Basically Deltacloud API provide access to cloud services through different
+collections. In REST terminology a collection is set of resources. So far
+Deltacloud API offers this basic collections for every driver:</p>
+
+<ul>
+<li>Hardware Profiles (/api/hardware_profiles)</li>
+<li>Realms (/api/realms)</li>
+<li>Images (/api/images)</li>
+<li>Instances (/api/instances)</li>
+</ul>
+
+<h2 id="hardware-profiles">Hardware profiles</h2>
+
+<p>To explain them briefly, the Hardware Profile determines how your virtual
+machine will be sized. Practically, you can specify how much CPUs, memory and
+storage your machine will consume. Ussualy, these hardware profiles are defined
+statically in a driver using our DSL like:</p>
+
+<script src="https://gist.github.com/1485993.js"> </script>
+
+<p>As you can see, this DSL allows you to use ranges or enumerative properties.
+This would be handy if the client want to have a bit of freedom on what size he
+currently wants.</p>
+
+<h2 id="realms">Realms</h2>
+
+<p>Realm basically represents a datacenter or a location of where your machine will
+be deployed. This doesn&rsquo;t mean only geographical location but it can also
+represent a place in your data center where it will be placed. For better
+understanding, you can imagine that you have two Realms. First for &lsquo;development&rsquo;
+where your development machines live and one for &lsquo;production&rsquo; where all your
+production virtual machines reside. If you have a tool to list all your realms,
+you can use it in a driver method, otherwise they can be defined
+statically like:</p>
+
+<script src="https://gist.github.com/1485995.js"> </script>
+
+<p>The last method is used across the drivers to filter final results. It&rsquo;s not the
+perfect way of how to &lsquo;filter&rsquo; whole collection. Some &lsquo;cloud&rsquo; providers offer a
+method to get just one single realm which is in some cases much faster than
+filtering the whole set.</p>
+
+<h2 id="images">Images</h2>
+
+<p>Image stands for a virtual machine template. Long story short, it represents a
+recipe of how a new machine will be built. In EC2 or Rackspace it stands for a
+pre-installed operating system image you can convert to your instance.  In
+VSphere driver it represents a virtual machine, marked as a template you can
+clone to a regular virtual machine. In your cloud, it can represent a prepared
+QCOW image you just copy over and launch via libvirt or other virtualization
+tools. In a Deltacloud driver, Image is defined like:</p>
+
+<script src="https://gist.github.com/1485999.js"> </script>
+
+<p>A state represents the current state of an image. It might indicate to user
+whether image is available or not, since sometimes the image is being built or
+updated.</p>
+
+<h2 id="instance-states">Instance states</h2>
+
+<p>Almost done, but one part is still missing there. Instance represents a realised
+virtual machine. So take all previous resources and you can create a new
+instance.</p>
+
+<p>Actually the Instance resource in Deltacloud API is the only object which has a
+real state. According to the state of the Instance, client is able to execute
+particular operations on it, like start, stop or destroy.</p>
+
+<p>It&rsquo;s up to you how you describe a behavior of your cloud. For inspiration you
+can take a look on the EC2 state-machine. It&rsquo;s defined using our DSL inside
+driver:</p>
+
+<script src="https://gist.github.com/1486003.js"> </script>
+
+<p>It would take a while to actually understand this but it&rsquo;s very important and it
+basically describes a behaviour of your cloud implementation.</p>
+
+<h2 id="instances">Instances</h2>
+
+<p>Now is the time to implement the Instance collection. In Deltacloud, it&rsquo;s
+implemented like:</p>
+
+<script src="https://gist.github.com/1486005.js"> </script>
+
+<p>As you can see, an Instance resource references to an Image, Realm and
+HardwareProfile. The Hardware Profile is a bit tricky, since it became an
+Instance Profile once it&rsquo;s used with Instance.  The public_addresses property
+tells user an IP address he can use for connecting to the instance. The username
+and password properties are optional and you can also use the &lsquo;key&rsquo; property if
+you want to use public_key authetication (for SSH).  Property which is
+responsible to track the state of the Instance is &lsquo;state&rsquo;. Instance should have
+state defined in your state machine (see top). To advertise the currently
+available actions to the user you can use our &lsquo;instanceactionsfor&rsquo; helper.</p>
+
+<h2 id="instance-actions">Instance actions</h2>
+
+<p>Since the Instance object is &lsquo;creatable&rsquo;, you must define the &lsquo;create_instance&rsquo;
+method in your driver in order to allow Instance creation. This method looks
+like:</p>
+
+<script src="https://gist.github.com/1486006.js"> </script>
+
+<p>This method should return an Instance resource after successful create
+operation. To manage your instances you need to add method for all actions
+defined in your state machine like:</p>
+
+<script src="https://gist.github.com/1486007.js"> </script>
+
+<p>After this, you&rsquo;re done and you have a fully functional Deltacloud driver.
+Besides this brief tutorial, you should take a look on the available drivers
+source code and also read the our official documentation available on Deltacloud
+web site.</p>
+
+          </div>
+        </div>
+        <div class="pagination">
+          <a class="btn previous " href="http://mfojtik.io/post/whats-new-in-deltacloud-api-v0-4-0/"> Prev</a>  
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+  <p>Powered by <a href="http://gohugo.io">hugo</a> and the <a
+    href="https://github.com/zhe/hugo-theme-slim">slim</a> theme.</p>
+</div>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-109743259-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-109743259-2');
+</script>
+
+  </div>
+  <script src="http://mfojtik.io/js/slim.js"></script>
+  <script src="http://mfojtik.io/js/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+  
+</body>
+
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title> Running OpenShift v3 on DigitalOcean &middot; mfojtik blog </title>
+
+
+<link rel="stylesheet" href="http://mfojtik.io/css/slim.css">
+<link rel="stylesheet" href="http://mfojtik.io/css/highlight.min.css">
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Source+Code+Pro' rel='stylesheet' type='text/css'>
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+<link rel="shortcut icon" href="/favicon.ico">
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+  <h1 class="site-title"><a href="http://mfojtik.io">mfojtik blog</a></h1>
+  <p class="site-tagline"><em>Look at you, hacker. A pathetic creature of meat and bone, panting and sweating as you run through my corridors. How can you challenge perfect immortal machine</em></p>
+  <div class="nav">
+    <a class="nav-btn" href="#">
+      <span class="ci ci-burger"></span>
+    </a>
+    <ul class="nav-list">
+       
+	  <li class="spacer">&ac;</li>
+
+      <li><a href="https://github.com/mfojtik">Github</a></li> 
+      <li><a href="https://twitter.com/mfojtik">Twitter</a></li> 
+    </ul>
+  </div>
+</div>
+
+    <div class="content">
+      <div class="posts">
+        <div class="post">
+          <h2 class="post-title"><a href="http://mfojtik.io/post/openshift-v3-digitalocean/">Running OpenShift v3 on DigitalOcean</a></h2>
+          <span class="post-date">Feb 12, 2016 </span>
+          <div class="post-content">
+            <p>I&rsquo;m running this blog (and couple other blogs and side-projects) on
+<a href="http://digitalocean.com">DigitalOcean</a> since 2014. Till this week, my VM looked
+like a typical VM from 90&rsquo;: mysql server, nginx+php, irssi. Nothing special
+about that setup really. But, since I&rsquo;m currently busy working on the <a href="http://github.com/openshift/origin">OpenShift
+v3</a> platform, I convinced myself to upgrade
+to the &ldquo;containers era&rdquo;.</p>
+
+<p>This blog post describes the steps I&rsquo;ve take to run the latest OpenShift v3
+platform and next post will explain how I containerized the apps I ran (this
+site included).</p>
+
+<p>The first thing I&rsquo;ve to get familiar myself was this
+<a href="https://github.com/openshift/openshift-ansible/blob/master/README_origin.md">repository</a>
+that contains the
+<a href="https://docs.openshift.org/latest/install_config/install/advanced_install.html">OpenShift</a>
+<a href="https://www.ansible.com/">Ansible</a> installer.</p>
+
+<p>Since I love to automatize things and I don&rsquo;t have that much free time to
+configure everything myself, I really fall in love with this installation
+system. It does not require anything special on the VM, except password-less SSH
+authentication.  And because DigitalOcean already have my SSH key, that is
+no-op.</p>
+
+<p>The next step was to actually create a VM that I will host my OpenShift v3. I
+choosed the 2GB/2CPU one, which is a little bit more expensive (~$20/month), but
+it gives me a little bit more space for running containers. It also comes with
+40GB of SSD storage, which is perfectly fine for some simple apps and I can use
+the SSD as a swap if I really need to.</p>
+
+<p>So the VM is up and running. I gave it name <code>alpha.mifo.sk</code>. The reason is that
+for now, I&rsquo;m going with all-in-one installation, but in future, who knows&hellip;  I
+selected the CentOS 7.1 box, which should be perfectly file and supported by the
+Ansible installer and the OpenShift v3 itself.  The only change I dit to that VM
+was to fix the <code>/etc/hosts</code> file:</p>
+
+<pre><code>178.62.231.166 alpha.mifo.sk
+</code></pre>
+
+<p>For some reason, the DNS name is assigned to point to <code>127.0.0.1</code>, which might
+cause troubles with Ansible.</p>
+
+<p>Now it is time to create the Ansible inventory file. I created mine <code>./alpha/hosts</code>
+file with the following content:</p>
+
+<pre><code>[OSEv3:children]
+masters
+nodes
+etcd
+
+[OSEv3:vars]
+ansible_ssh_user=root
+deployment_type=origin
+openshift_node_kubelet_args={'max-pods': ['40'], 'image-gc-high-threshold': ['90'], 'image-gc-low-threshold': ['80']}
+
+[masters]
+alpha.mifo.sk openshift_ip=178.62.231.166 openshift_hostname=alpha.mifo.sk openshift_public_ip=178.62.231.166 openshift_public_hostname=alpha.mifo.sk
+
+[nodes]
+alpha.mifo.sk openshift_ip=178.62.231.166 openshift_hostname=alpha.mifo.sk openshift_public_ip=178.62.231.166 openshift_public_hostname=alpha.mifo.sk
+
+[etcd]
+alpha.mifo.sk openshift_ip=178.62.231.166 openshift_hostname=alpha.mifo.sk openshift_public_ip=178.62.231.166 openshift_public_hostname=alpha.mifo.sk
+</code></pre>
+
+<p>This configuration basically says:</p>
+
+<ul>
+<li>I want <strong>all-in-one VM</strong> that runs the &ldquo;master&rdquo; but also acts as a &ldquo;node&rdquo; in the
+OpenShift cluster.</li>
+<li>I want the <a href="https://coreos.com/etcd/docs/latest/">etcd</a> to run on the same VM as well.</li>
+<li>The node should have limit for maximum pods set to 40 (just a pre-caution&hellip;)</li>
+</ul>
+
+<p>Now it is time to clone the Ansible installer GIT repository:</p>
+
+<pre><code>$ git clone https://github.com/openshift/openshift-ansible
+</code></pre>
+
+<p>And finally proceed with the installation:</p>
+
+<pre><code>$ cd openshift-ansible
+$ ansible-playbook playbooks/byo/config.yml --inventory ~/alpha/hosts
+</code></pre>
+
+<p>You can now watch the Ansible installation output (should take less than
+~5 minutes). After it finishes, the OpenShift Console should be available
+at <code>https://alpha.mifo.sk:8443</code> (replace with your hostname&hellip;).</p>
+
+<p>After you login to the console, you will notice that it is not really the
+securest place in the world. OpenShift basically allows any user to login and it
+will automatically create new users. Not cool for &ldquo;production&rdquo; use.</p>
+
+<p>Fortunatelly, OpenShift offers pretty long list of <a href="https://docs.openshift.org/latest/install_config/configuring_authentication.html">supported identity
+providers</a>.
+, so I choosed the Github one, which is really easy to configure.</p>
+
+<p>After I configured it and restarted the origin-master systemd service, I noticed
+another odd thing. Now when I&rsquo;m going to OpenShift login page, I&rsquo;m redirected to
+Github application page for authentication. After I allow my Github app to use
+my own Github account informations, I get redirected back to OpenShift console
+and I&rsquo;m logged in.</p>
+
+<p>So what is odd here? Any Github user can now login to my OpenShift console! To
+fix this, you have to set the <code>mappingMethod</code> property in configuration to
+&ldquo;lookup&rdquo; (and restart openshift server).</p>
+
+<p>By doing that, only users that logged in already will have access to OpenShift
+console, which is fine for me. If I want to give access to another user, I can
+just manually create it in OpenShift, or temporarely open logging by switching
+to &ldquo;claim&rdquo;.</p>
+
+<p>Another post-installation step, that I did for my OpenShift installation was to
+configure NFS server. Why? Because I want to be able to use the persistent
+volumes in my containers (like database&hellip;). You can read how to setup
+persistent storage in OpenShift in the <a href="https://docs.openshift.org/latest/install_config/persistent_storage/persistent_storage_nfs.html">official
+documentation</a></p>
+
+<p>The last thing I noticed after installation, was that the &ldquo;node&rdquo; was in
+&ldquo;un-schedulable&rdquo; state. That means, no container are allowed to schedule on this
+VM. To fix that, you have to run:</p>
+
+<pre><code>$ oadm manage-node alpha.mifo.sk --schedulable=true
+</code></pre>
+
+<p>Now the containers will start to launch and you are good to go create your
+applications and deploy some services.</p>
+
+<p>Next time, I will explain how I containerized this blog and deployed it in
+OpenShift.</p>
+
+          </div>
+        </div>
+        <div class="pagination">
+          <a class="btn previous " href="http://mfojtik.io/post/running-hugo-in-openshift/"> Prev</a>  
+          <a class="btn next " href="http://mfojtik.io/bio/"> Next</a> 
+        </div>
+      </div>
+    </div>
+    
+    <div id="disqus_thread"></div>
+    <script>
+      var disqus_config = function () {
+        this.page.url = "http://mfojtik.io/post/openshift-v3-digitalocean/";
+        
+      };
+      (function() {
+        var d = document, s = d.createElement('script');
+        s.src = '//mfojtik.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+      })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+    
+    <div class="footer">
+  <p>Powered by <a href="http://gohugo.io">hugo</a> and the <a
+    href="https://github.com/zhe/hugo-theme-slim">slim</a> theme.</p>
+</div>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-109743259-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-109743259-2');
+</script>
+
+  </div>
+  <script src="http://mfojtik.io/js/slim.js"></script>
+  <script src="http://mfojtik.io/js/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+  
+</body>
+
+</html>

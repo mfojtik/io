@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title> Whats new in Deltacloud API v0.4.0 &middot; mfojtik blog </title>
+
+
+<link rel="stylesheet" href="http://mfojtik.io/css/slim.css">
+<link rel="stylesheet" href="http://mfojtik.io/css/highlight.min.css">
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Source+Code+Pro' rel='stylesheet' type='text/css'>
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+<link rel="shortcut icon" href="/favicon.ico">
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+  <h1 class="site-title"><a href="http://mfojtik.io">mfojtik blog</a></h1>
+  <p class="site-tagline"><em>Look at you, hacker. A pathetic creature of meat and bone, panting and sweating as you run through my corridors. How can you challenge perfect immortal machine</em></p>
+  <div class="nav">
+    <a class="nav-btn" href="#">
+      <span class="ci ci-burger"></span>
+    </a>
+    <ul class="nav-list">
+       
+	  <li class="spacer">&ac;</li>
+
+      <li><a href="https://github.com/mfojtik">Github</a></li> 
+      <li><a href="https://twitter.com/mfojtik">Twitter</a></li> 
+    </ul>
+  </div>
+</div>
+
+    <div class="content">
+      <div class="posts">
+        <div class="post">
+          <h2 class="post-title"><a href="http://mfojtik.io/post/whats-new-in-deltacloud-api-v0-4-0/">Whats new in Deltacloud API v0.4.0</a></h2>
+          <span class="post-date">Sep 16, 2011 </span>
+          <div class="post-content">
+            
+
+<p>Yesterday we proudly announced the official release of Deltacloud API version 0.4.0. I would like to share with us the new features which are included in this release. I took several month to bump the release version so the list of new things is pretty log.</p>
+
+<h2 id="new-command-line-options">New command-line options</h2>
+
+<p>The deamonized server is started on the background and it automatically logs to the system log. This option will be used widely in init scripts on Linux OS. To try it out just add &ndash;daemon option to deltacloudd.
+Deltacloud supports variety of cloud providers via drivers. However it was pretty hard to get list of all supported drivers in your installation. Now we introduce the &ndash;drivers option which will show you all installed and ready to use drivers.
+SSL support. This is not directly the Deltacloud API feature but the &lsquo;thin&rsquo; feature which is the Ruby web server we&rsquo;re using to deploy Sinatra. Support for the SSL was imported to latest thin and Deltacloud API just exposes this feature to user via &ndash;ssl and &ndash;ssl-key command line options.
+The new &ndash;config file option gives you ability to store backend cloud configuration in YAML file. You can store provider, username and password here so Deltacloud API will set those properties as default for the current instance.</p>
+
+<h2 id="new-ui">New UI</h2>
+
+<p>We decided to put more effort into user experience and starting with this release, you can enjoy fabulous UI also on mobile devices. We chose jquery.mobile framework because we&rsquo;d already been using JQuery and this framework is currently the most fastest growing mobile application web framework around. This UI change required a lot of work in our HAML view and caused various incompatibilities in old browsers.
+All this should be fixed now. As a side project, I created a small DSL called rbmobile which helps programmers with JQuery UI HTML generation in HAML.</p>
+
+<h2 id="new-packaging-schema">New packaging schema</h2>
+
+<p>Another huge change to Deltacloud API project. Currently, when you use Linux and RPM based distributions, you can install Deltacloud using the yum install deltacloud-core which pulls in all drivers with all their dependencies. But sometimes this is not what you really want.
+Splitting the driver configuration enables us to create a set of subpackages for Fedora for each driver we support. Each subpackage tracks it own dependencies. For example, if you want to use Deltacloud with EC2, you can now install deltacloud (Deltacloud?) in Fedora using: yum install deltacloud-core-ec2. To install all drivers you can use yum install deltacloud-core-all.</p>
+
+<h2 id="support-for-vsphere-rhev-m-3-0-and-condor-cloud">Support for VSphere, RHEV-M 3.0 and Condor Cloud</h2>
+
+<p>This is probably the biggest feature of new Deltacloud API. We have full support for the VMWare Vsphere provider which includes basic collections as images or instances but also semi-advanced features like the user-data injection via virtual CD-ROM driver.
+Secondly we improved our support for RHEV-M provider and fix all incompatibilities with upcoming RHEV-M 3.0 release (which is now beta1).
+Was thinking about running your private cloud using libvirt with Deltacloud. I got numerous questions about this feature and now, the Condor driver is the answer. However, setup of this thing is not very easy but there should be a quick howto very soon. Meanwhile there is our devel howto available.</p>
+
+          </div>
+        </div>
+        <div class="pagination">
+          <a class="btn previous " href="http://mfojtik.io/post/making-a-dsl-in-ruby/"> Prev</a>  
+          <a class="btn next " href="http://mfojtik.io/post/how-to-create-a-new-deltacloud-api-driver/"> Next</a> 
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+  <p>Powered by <a href="http://gohugo.io">hugo</a> and the <a
+    href="https://github.com/zhe/hugo-theme-slim">slim</a> theme.</p>
+</div>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-109743259-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-109743259-2');
+</script>
+
+  </div>
+  <script src="http://mfojtik.io/js/slim.js"></script>
+  <script src="http://mfojtik.io/js/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+  
+</body>
+
+</html>

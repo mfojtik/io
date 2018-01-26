@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title> Making a DSL in Ruby &middot; mfojtik blog </title>
+
+
+<link rel="stylesheet" href="http://mfojtik.io/css/slim.css">
+<link rel="stylesheet" href="http://mfojtik.io/css/highlight.min.css">
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Source+Code+Pro' rel='stylesheet' type='text/css'>
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+<link rel="shortcut icon" href="/favicon.ico">
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+  <h1 class="site-title"><a href="http://mfojtik.io">mfojtik blog</a></h1>
+  <p class="site-tagline"><em>Look at you, hacker. A pathetic creature of meat and bone, panting and sweating as you run through my corridors. How can you challenge perfect immortal machine</em></p>
+  <div class="nav">
+    <a class="nav-btn" href="#">
+      <span class="ci ci-burger"></span>
+    </a>
+    <ul class="nav-list">
+       
+	  <li class="spacer">&ac;</li>
+
+      <li><a href="https://github.com/mfojtik">Github</a></li> 
+      <li><a href="https://twitter.com/mfojtik">Twitter</a></li> 
+    </ul>
+  </div>
+</div>
+
+    <div class="content">
+      <div class="posts">
+        <div class="post">
+          <h2 class="post-title"><a href="http://mfojtik.io/post/making-a-dsl-in-ruby/">Making a DSL in Ruby</a></h2>
+          <span class="post-date">Dec 11, 2011 </span>
+          <div class="post-content">
+            <p>The main goal of writing such thing as a DSL is ussualy helping yourself to not
+repeat the same code over and over (keeping code DRY). Tradeoff for this
+approach is ussualy a piece of unreadable and complex code with simple purpose:
+To handle this DSL and translate it to Ruby language. Lets take a quick example:</p>
+
+<p>rule :apache do
+  enable 80
+  enable 8080
+  enable 443
+  name &lsquo;example.com&rsquo;
+  directory &lsquo;/var/www/example.com&rsquo;
+  update 120
+end</p>
+
+<p>This DSL is self describing. It creates a configuration rules for Apache.
+However this example also introduce some basic mistakes which people ussualy
+do when designing DSL. First of all, the original idea of writing such thing
+is to keep code DRY. Now look again on example above. The word &lsquo;enable&rsquo; is used
+there three times, which definitely isn&rsquo;t DRY. The proper syntax should be:</p>
+
+<p>rule :apache do
+  enable 80, 8080, 443
+end</p>
+
+<p>Now, the ugly next thing on the DSL sample above is that it&rsquo;s not descriptive
+enough. If you&rsquo;re spending the time on writing code that will handle example
+above, lets take few extra minutes and think about the right methods names.
+For example the property &lsquo;name&rsquo; says nothing about its suppose. Perhaps it&rsquo;s
+name of the rule or the domain name. This automatically force further
+implementors to look inside documentation, which is &lsquo;wrong&rsquo;. Lets refactor this
+example once again:</p>
+
+<p>rule :apache do
+  enable 80, 8080, 443
+  domain &lsquo;example.com&rsquo;
+  root_path &lsquo;/var/www/example.com&rsquo;
+  update_interval 120
+end</p>
+
+<p>The last nasty nit of our DSL example is the fact that reader (you ;-) have no
+clue about what the value of &lsquo;update_interval&rsquo; is set to. Is the &lsquo;120&rsquo; value
+specified in minutes? Or perhaps in seconds? This sort of questions are ussualy
+wrong and confuse people. How about using something like this:</p>
+
+<p>rule :apache do
+  update_every 2.minutes
+end</p>
+
+<p>Since every class in Ruby is open, it&rsquo;s easy enough to add methods like
+&lsquo;.minutes&rsquo; or &lsquo;.seconds&rsquo; to Integer class.</p>
+
+<p>Now, when we&rsquo;re happy with the architecture of our DSL, lets implement it in
+Ruby. As you may guess, when there is word &lsquo;do&rsquo; in Ruby it ussualy means a
+&lsquo;block&rsquo;. You should get familiar with this Ruby feature ASAP, otherwise the code
+below will look cryptic for you :-)</p>
+
+<p>First we&rsquo;re going to implement the &lsquo;Rule&rsquo; class. It&rsquo;s a good practise to use
+class name same as the root of DSL.</p>
+
+<p>class Rule
+  attr_accestor :name, :ports, :domain, :root_path, :update_interval</p>
+
+<p>def initialize(name, &amp;block)
+    @name = name
+    instance_eval(&amp;block) if block_given?
+  end</p>
+
+<p>def enable(*ports)
+    @ports = ports.map
+  end</p>
+
+<p>def domain(name)
+    @name = name
+  end</p>
+
+<p>def root_path(name)
+    @root_path = name
+  end</p>
+
+<p>def update_interval(interval)
+    @update_interval = interval
+  end</p>
+
+<p>end</p>
+
+<p>Now, if you look on the code above, the first thing that will hurt your eyes is
+that methods for setting variables is not really DRY. We&rsquo;re repeating the same
+pattern in setting instance variables. Now, lets refactor this code a little
+bit:</p>
+
+<p>class Rule
+  attr_accestor :name, :ports
+  (@@config_attrs = [ :domain, :root_path, update_interval ]).each do |a|
+    attr_accessor a
+  end</p>
+
+<p>def initialize(name, &amp;block)
+    @name = name
+    instance_eval(&amp;block) if block_given?
+  end</p>
+
+<p>def enable(*ports)
+    @ports = ports.map
+  end</p>
+
+<p>def method_missing(name, *args)
+    if name.member_of(@@config_attrs)
+      send(name+&ldquo;=&rdquo;, args.first)
+    end
+  end</p>
+
+<p>end</p>
+
+          </div>
+        </div>
+        <div class="pagination">
+          <a class="btn previous " href="http://mfojtik.io/post/howto-deploy-deltacloud-to-openshift/"> Prev</a>  
+          <a class="btn next " href="http://mfojtik.io/post/whats-new-in-deltacloud-api-v0-4-0/"> Next</a> 
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+  <p>Powered by <a href="http://gohugo.io">hugo</a> and the <a
+    href="https://github.com/zhe/hugo-theme-slim">slim</a> theme.</p>
+</div>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-109743259-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-109743259-2');
+</script>
+
+  </div>
+  <script src="http://mfojtik.io/js/slim.js"></script>
+  <script src="http://mfojtik.io/js/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+  
+</body>
+
+</html>
