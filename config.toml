@@ -17,7 +17,7 @@ copyright = "&copy; mfojtik"
   avatar = "https://avatars0.githubusercontent.com/u/44136"
   contact = "mailto:blog@mfojtik.io"
   bio = "Software Engineer working on Kubernetes and OpenShift, Gopher, hiker, climber."
-  subtitle = "Look at you, hacker. A pathetic creature of meat and bone, panting and sweating as you run through my corridors. How can you challenge perfect immortal machine."
+  subtitle = "Look at you, hacker. A pathetic creature of meat and bone, panting and sweating as you run through my corridors.<br/> How can you challenge perfect immortal machine."
 
 [[menu.main]]
     name = "/blog"
