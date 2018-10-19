@@ -1,2 +1,2 @@
 [build.environment]
-  GO_IMPORT_PATH = "github.com/mfojtik/hugo-blog
+  GO_IMPORT_PATH = "github.com/mfojtik/hugo-blog"
