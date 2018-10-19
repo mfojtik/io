@@ -1,6 +1,6 @@
 baseurl = "http://mfojtik.io"
 languageCode = "en-us"
-Title = "@mfojtik blog"
+Title = "@mfojtik.io"
 copyright = "&copy; mfojtik"
 
 [params]
