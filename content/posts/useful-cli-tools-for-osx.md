@@ -16,13 +16,13 @@ While this always get optimal results, in some cases I would like to search in t
 use different log format. While this is possible via endless combination of `git log` arguments,
 the `tig` command provide really nice ncurses interface to accomplish this job.
 
-![tig log][/cli_tig_log.png]
+![tig log](/cli_tig_log.png)
 
 But it is not only the repository history browser. In fact it is much more. I learned to use
 `tig status` command to properly split my changes to multiple commits. This command allows you
 to manually pick blocks or single lines of changes and make logical commits out from them.
 
-![tig status][/cli_tig_status.png]
+![tig status](/cli_tig_status.png)
 
 lnav
 --------------
@@ -37,7 +37,7 @@ or warnings. Also word wrapping in `less` is always cumbersome.
 The `lnav` tool provide many ways to filter the log files, but also regular files and it defacto
 became an alias for `less` to me.
 
-![lnav][/cli_lnav.png]
+![lnav](/cli_lnav.png)
 
 bat
 -------------
@@ -46,4 +46,4 @@ Don't worry, this has nothing to do with flighting creatures. I believe the word
 'better cat'. And it is indeed better in many ways. It adds syntax highlighting to code and line numbers.
 It also display changed lines (git), so it turns the `cat foo.go` into full editor display mode.
 
-![bat][/cli_bat.png]
+![bat](/cli_bat.png)
