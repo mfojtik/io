@@ -13,6 +13,8 @@ He leads a group inside the OpenShift engineering organization that includes thr
 As part of his role, he is responsible for reviewing architectural changes and participates in general product feature design as well as day-to-day teams operations.
 Over the years, he contributed to several [Kubernetes](https://kubernetes.io) components, including code generation, API machinery and workloads controllers. In OpenShift, his main area of contribution is operators and API servers.
 
+In free time, he enjoys mountain climbing, hiking and skiing. 
+
 * [Github Profile](https://github.com/mfojtik)
 * [LinkedIn Profile](https://www.linkedin.com/in/michalfojtik)
 
