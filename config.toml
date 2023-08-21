@@ -10,14 +10,12 @@ copyright = "&copy; mfojtik"
   github = "mfojtik"
   # Disqus shortname
   disqus = "mfojtik"
-  # Google Analytics API key.
-  ga_api_key = "UA-109743259-2'"
   author = "Michal Fojtik"
   authorwebsite = "mfojtik.io"
   avatar = "https://avatars0.githubusercontent.com/u/44136"
   contact = "mailto:blog@mfojtik.io"
   bio = "Software Engineer and Engineering Manager on Kubernetes, OpenShift. Go lang developer. Climber."
-  subtitle = "Look at you, hacker. A pathetic creature of meat and bone, panting and sweating as you run through my corridors.<br/> How can you challenge perfect immortal machine."
+  subtitle = "Look at you, hacker. A pathetic creature of meat and bone, panting and sweating as you run through my corridors. How can you challenge perfect immortal machine."
 
 [[menu.main]]
     name = "/blog"
