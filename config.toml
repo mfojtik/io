@@ -18,7 +18,7 @@ copyright = "&copy; mfojtik"
   subtitle = "Look at you, hacker. A pathetic creature of meat and bone, panting and sweating as you run through my corridors. How can you challenge perfect immortal machine."
 
 [[menu.main]]
-    name = "/blog"
+    name = "/home"
     url = "/"
     weight = 1
 
@@ -26,6 +26,11 @@ copyright = "&copy; mfojtik"
     name = "/bio"
     url = "/bio"
     weight = 2
+
+[[menu.main]]
+    name = "/social"
+    url = "https://social.mfojtik.io/@mfojtik"
+    weight = 3
 
 [related]
   # Only include matches with rank >= threshold. This is a normalized rank between 0 and 100.
