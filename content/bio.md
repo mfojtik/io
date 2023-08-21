@@ -1,5 +1,5 @@
 +++
-date = "2023-08-21T14:44:48+01:00"
+date = "2023-08-20T14:44:48+01:00"
 draft = false
 title = "Michal Fojtik Life Log"
 
