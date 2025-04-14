@@ -25,6 +25,10 @@ friends = false
 bookmarks = false
 about_me = true
 
+[[params.additional_menus]]
+  title =  "ARCHIVE"
+  href =  "/archive/"
+
 [params.social]
   rss            = true 
   email          = "mfojtik@pm.me"
@@ -47,18 +51,6 @@ about_me = true
 [[params.additional_menus]]
   title =  "ABOUT"
   href =  "/about/"
-
-#  paginate = 10
-#  twitter = "mfojtik"
-#  instagram = "mifosk"
-#  github = "mfojtik"
-#  disqus = "mfojtik"
-#  author = "Michal Fojtik"
-#  authorwebsite = "mfojtik.io"
-#  avatar = "/avatar.png"
-#  contact = "mailto:blog@mfojtik.io"
-#  bio = "Software Engineer and Engineering Manager on Kubernetes, OpenShift. Go lang developer. Climber."
-#  subtitle = "Look at you, hacker. A pathetic creature of meat and bone, panting and sweating as you run through my corridors. How can you challenge perfect immortal machine."
 
 [markup]
   [markup.tableOfContents]
