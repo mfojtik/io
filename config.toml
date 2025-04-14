@@ -1,58 +1,71 @@
 baseurl = "http://mfojtik.io"
 languageCode = "en-us"
-Title = "@mfojtik.io"
-copyright = "&copy; mfojtik"
+theme = "hugo-theme-cleanwhite"
+title = "@mfojtik.io"
+preserveTaxonomyNames = true
+copyright = "&copy; Michal Fojtik"
+hasCJKLanguage = true
+
+[pagination]
+  pagerSize = 5 # frontpage pagination
 
 [params]
-  paginate = 10
-  twitter = "mfojtik"
-  instagram = "mifosk"
-  github = "mfojtik"
-  # Disqus shortname
-  disqus = "mfojtik"
-  author = "Michal Fojtik"
-  authorwebsite = "mfojtik.io"
-  avatar = "/avatar.png"
-  contact = "mailto:blog@mfojtik.io"
-  bio = "Software Engineer and Engineering Manager on Kubernetes, OpenShift. Go lang developer. Climber."
-  subtitle = "Look at you, hacker. A pathetic creature of meat and bone, panting and sweating as you run through my corridors. How can you challenge perfect immortal machine."
+SEOTitle = "Michal Fojtik | @mfojtik blog"
+description = "Traveler, Kubernetes Contributor, Go Developer, Border Collie Fan, Pathetic Climber"
+keyword = "travel, border collie, mountaining, climbing, personal blog"
+slogan = "One breath, one journey a single flame in the dark, gone with morning wind."
+upstreamAttribution = true
+header_image = "/home-bg-matternhorn.png"
+omit_categories = false
+sidebar_about_description = "Software Developer, Open Source Enthusiast and Life Adventurer"
+sidebar_avatar = "/me.png"      # use absolute URL, seeing it's used in both `/` and `/about/`
+featured_tags = false 
+featured_condition_size = 1 
+friends = false
+bookmarks = false
+about_me = true
 
-[[menu.main]]
-    name = "/home"
-    url = "/"
-    weight = 1
+[params.social]
+  rss            = true 
+  email          = "mfojtik@pm.me"
+  facebook       = "https://www.facebook.com/mfojtik.io"
+  linkedin       = "https://www.linkedin.com/in/michalfojtik/"
+  #stackoverflow  = "https://stackoverflow.com/users/yourstackoverflowid"
+  #instagram     = "full profile url in instagram"
+  github         = "https://github.com/mfojtik"
+  #wechat         = "your wechat qr code image"
+  #medium        = "full profile url in medium"
+  #slack         = "full workspace url in slack"
+  #pinterest     = "full profile url in pinterest"
+  #reddit        = "full profile url in reddit"
+  #gitlab        = "full profile url in gitlab"
+  #mastodon      = "full profile url in mastodon"
+  #keybase       = "full profile url in keybase"
+  #xing          = "https://www.xing.com/profile/yourxingid"
+  #git           = "full profile url for git user"
+  
+[[params.additional_menus]]
+  title =  "ABOUT"
+  href =  "/about/"
 
-[[menu.main]]
-    name = "/bio"
-    url = "/bio"
-    weight = 2
+#  paginate = 10
+#  twitter = "mfojtik"
+#  instagram = "mifosk"
+#  github = "mfojtik"
+#  disqus = "mfojtik"
+#  author = "Michal Fojtik"
+#  authorwebsite = "mfojtik.io"
+#  avatar = "/avatar.png"
+#  contact = "mailto:blog@mfojtik.io"
+#  bio = "Software Engineer and Engineering Manager on Kubernetes, OpenShift. Go lang developer. Climber."
+#  subtitle = "Look at you, hacker. A pathetic creature of meat and bone, panting and sweating as you run through my corridors. How can you challenge perfect immortal machine."
 
-[[menu.main]]
-    name = "/social"
-    url = "https://social.mfojtik.io/@mfojtik"
-    weight = 3
-
-[related]
-  # Only include matches with rank >= threshold. This is a normalized rank between 0 and 100.
-  threshold = 80
-
-  # To get stable "See also" sections we, by default, exclude newer related pages.
-  includeNewer = false
-
-  # Will lower case keywords in both queries and in the indexes.
-  toLower = false
-
-  [[related.indices]]
-  name = "keywords"
-  weight = 150
-  [[related.indices]]
-  name  = "author"
-  toLower = true
-  weight = 30
-  [[related.indices]]
-  name  = "tags"
-  weight = 100
-  [[related.indices]]
-  name  = "date"
-  weight = 10
-  pattern = "2017"
+[markup]
+  [markup.tableOfContents]
+    endLevel = 2
+    startLevel = 1
+  [markup.highlight]
+    style = "dracula"
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true

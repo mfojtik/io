@@ -1,0 +1,58 @@
+baseurl = "http://mfojtik.io"
+languageCode = "en-us"
+Title = "@mfojtik.io"
+copyright = "&copy; mfojtik"
+
+[params]
+  paginate = 10
+  twitter = "mfojtik"
+  instagram = "mifosk"
+  github = "mfojtik"
+  # Disqus shortname
+  disqus = "mfojtik"
+  author = "Michal Fojtik"
+  authorwebsite = "mfojtik.io"
+  avatar = "/avatar.png"
+  contact = "mailto:blog@mfojtik.io"
+  bio = "Software Engineer and Engineering Manager on Kubernetes, OpenShift. Go lang developer. Climber."
+  subtitle = "Look at you, hacker. A pathetic creature of meat and bone, panting and sweating as you run through my corridors. How can you challenge perfect immortal machine."
+
+[[menu.main]]
+    name = "/home"
+    url = "/"
+    weight = 1
+
+[[menu.main]]
+    name = "/bio"
+    url = "/bio"
+    weight = 2
+
+[[menu.main]]
+    name = "/social"
+    url = "https://social.mfojtik.io/@mfojtik"
+    weight = 3
+
+[related]
+  # Only include matches with rank >= threshold. This is a normalized rank between 0 and 100.
+  threshold = 80
+
+  # To get stable "See also" sections we, by default, exclude newer related pages.
+  includeNewer = false
+
+  # Will lower case keywords in both queries and in the indexes.
+  toLower = false
+
+  [[related.indices]]
+  name = "keywords"
+  weight = 150
+  [[related.indices]]
+  name  = "author"
+  toLower = true
+  weight = 30
+  [[related.indices]]
+  name  = "tags"
+  weight = 100
+  [[related.indices]]
+  name  = "date"
+  weight = 10
+  pattern = "2017"
