@@ -53,6 +53,4 @@ Lucerne has a few must-sees. The old town is charming, though a bit touristy wit
 
 ![](/images/lucerne.jpg)
 
-## To be continued
-
-Comming up next: Kandersteg.
+[Continue...](/post/roadtrip-switzerland-part-2)
